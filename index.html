@@ -12,24 +12,24 @@
         <h2><a>&lt;</a>enter new words<a>&gt;</a></h2>
         <hr>
         <div class="special-chars">
-            <button onclick="" value="ä">ä</button>
-            <button onclick="" value="å">å</button>
-            <button onclick="" value="ö">ö</button>
+            <button onclick="CopyToClipboard('ä')" id="umlauta">ä</button>
+            <button onclick="CopyToClipboard('å')" id="overringa">å</button>
+            <button onclick="CopyToClipboard('ö')" id="umlauto">ö</button>
         </div>
         <fieldset>
             <label for="word-swedish">enter new word in <a>&lt;</a>Swedish<a>&gt;</a></label>
-            <input type="text" id="word-swedish" placeholder="Sverige" required/>
+            <input type="text" id="word-swedish" placeholder="Sverige"/>
         </fieldset>
         <fieldset>
             <label for="word-czech">enter new word in <a>&lt;</a>Czech<a>&gt;</a></label>
-            <input type="text" id="word-czech" placeholder="Švédsko" required/>
+            <input type="text" id="word-czech" placeholder="Švédsko"/>
         </fieldset>
         <fieldset>
-            <label for="word-set">enter the word's <a>&lt;</a>set index<a>&gt;</a></label>
-            <input type="number" id="word-set" placeholder="0" required/>
+            <label for="word-set">enter the word's <a>&lt;</a>set<a>&gt;</a></label>
+            <input type="text" id="word-set" placeholder="geography"/>
         </fieldset>
-        <button type="submit" onclick="">Add new word</button>
-        <!-- TODO: add empty field checking, clear up input fields when submitted -->
+        <button type="submit" onclick="addToVoc(swedishInput, czechInput, wordSet)">Add new word</button>
+        <div id="known-sets"></div>
     </section>
     <section class="select-mode">
         <h2><a>&lt;</a>choose mode<a>&gt;</a></h2>

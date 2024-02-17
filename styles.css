@@ -6,6 +6,10 @@
     color: #efefef;
 }
 
+body {
+    width: 500px;
+}
+
 section {
     margin-bottom: 10px;
 }
@@ -46,4 +50,12 @@ button {
 
 a {
     color: steelblue;
+}
+
+.listed-sets {
+    background-color: black;
+    width: min-content;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%;
 }
