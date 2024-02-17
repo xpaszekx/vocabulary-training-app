@@ -1,0 +1,49 @@
+* {
+    box-sizing: border-box;
+    margin: 4px;
+    font-family: Consolas, sans-serif;
+    background-color: #202020;
+    color: #efefef;
+}
+
+section {
+    margin-bottom: 10px;
+}
+
+.special-chars {
+    padding: 0;
+}
+
+.special-chars button {
+    font-size: 1rem;
+    margin: 0;
+}
+
+h2 {
+    margin-bottom: 0;
+}
+
+hr {
+    border: 1px solid lightslategrey;
+}
+
+fieldset {
+    width: 280px;
+    border: 1px solid steelblue;
+    margin-bottom: 8px;
+    padding: 4px;
+}
+
+input {
+    background-color: whitesmoke;
+    color: #202020;
+}
+
+button {
+    background-color: black;
+    font-size: 1.4rem;
+}
+
+a {
+    color: steelblue;
+}
