@@ -12,9 +12,9 @@
         <h2><a>&lt;</a>enter new words<a>&gt;</a></h2>
         <hr>
         <div class="special-chars">
-            <button onclick="CopyToClipboard('ä')" id="umlauta">ä</button>
-            <button onclick="CopyToClipboard('å')" id="overringa">å</button>
-            <button onclick="CopyToClipboard('ö')" id="umlauto">ö</button>
+            <button onclick="CopyToClipboard('ä')">ä</button>
+            <button onclick="CopyToClipboard('å')">å</button>
+            <button onclick="CopyToClipboard('ö')">ö</button>
         </div>
         <fieldset>
             <label for="word-swedish">enter new word in <a>&lt;</a>Swedish<a>&gt;</a></label>
@@ -34,8 +34,10 @@
     <section class="select-mode">
         <h2><a>&lt;</a>choose mode<a>&gt;</a></h2>
         <hr>
-        <button onclick="">Training</button>
-        <button onclick="">Testing</button>
+        <button onclick="loadPractice()">Practice</button>
+        <button onclick="loadTesting()">Testing</button>
+    </section>
+    <section id="modal-window">
     </section>
     <script src="script.js"></script>
 </body>

@@ -4,10 +4,7 @@
     font-family: Consolas, sans-serif;
     background-color: #202020;
     color: #efefef;
-}
-
-body {
-    width: 500px;
+    /*border: 1px solid black;*/
 }
 
 section {
@@ -58,4 +55,53 @@ a {
     word-wrap: break-word;
     overflow-wrap: break-word;
     max-width: 100%;
+}
+
+#modal-window {
+    width: 280px;
+}
+
+.modal {
+    position: fixed;
+    z-index: 1;
+    left: 30%;
+    top: 15%;
+    width: 60%;
+    height: 60%;
+    overflow: auto;
+    background-color: #202020;
+    border: 2px solid lightslategrey;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.close {
+    float: right;
+    font-size: 20px;
+}
+
+.close:hover,
+.close:focus {
+    color: steelblue;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.cards {
+    display: flex;
+    margin: auto;
+    gap: 40px;
+}
+
+.word-div {
+    height: 200px;
+    width: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: auto;
+    font-size: 2rem;
+    background-color: lightslategrey;
+    box-shadow: black 0 10px;
 }
