@@ -89,13 +89,20 @@ a {
 
 .cards {
     display: flex;
-    margin: auto;
     gap: 40px;
 }
 
-.word-div {
-    height: 200px;
+#czech-div {
+    display: grid;
     width: 300px;
+    height: 200px;
+    margin: auto;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.card {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -103,4 +110,31 @@ a {
     font-size: 2rem;
     background-color: lightslategrey;
     box-shadow: black 0 10px;
+}
+
+.card.swedish, #czech-div, #czech-word {
+    height: 200px;
+    width: 300px;
+}
+
+.card.czech {
+    height: 80px;
+    width: 140px;
+    font-size: 1rem;
+}
+
+#modal-footer {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+}
+
+#next-btn {
+    position: relative;
+    left: 10px;
+    bottom: 10px;
+}
+
+.score {
+    font-size: 1.5rem;
 }
