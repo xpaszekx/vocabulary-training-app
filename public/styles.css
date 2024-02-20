@@ -48,7 +48,7 @@ a {
     color: steelblue;
 }
 
-.listed-sets {
+.listed-cats {
     background-color: black;
     width: min-content;
     word-wrap: break-word;
@@ -56,7 +56,7 @@ a {
     max-width: 100%;
 }
 
-#modal-window {
+#select-cat {
     width: 280px;
 }
 

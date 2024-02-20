@@ -14,26 +14,26 @@ const Setup = async () => {
             id INTEGER PRIMARY KEY,
             swedish TEXT NOT NULL,
             czech TEXT NOT NULL,
-            wordset TEXT NOT NULL
+            category TEXT NOT NULL
         );`
     )
 
     _db = db;
 }
 
-const fetchVocab = async (set) => {
-    if (set === "") { // i hate JS
+const fetchVocab = async (category) => {
+    if (category === "") { // i hate JS
         return await _db.all("SELECT * FROM vocabs");
     }
-    return await _db.all("SELECT * FROM vocabs WHERE wordset = ?", set);
+    return await _db.all("SELECT * FROM vocabs WHERE category = ?", category);
 }
 
 const saveNewVocab = async (entry) => {
-    return await _db.run("INSERT INTO vocabs (swedish, czech, wordset) VALUES (?, ?, ?)", entry.swedish, entry.czech, entry.set);
+    return await _db.run("INSERT INTO vocabs (swedish, czech, category) VALUES (?, ?, ?)", entry.swedish, entry.czech, entry.category);
 }
 
-const loadSets = async() => {
-    return await _db.all("SELECT DISTINCT wordset FROM vocabs");
+const loadCats = async() => {
+    return await _db.all("SELECT DISTINCT category FROM vocabs");
 }
 
-module.exports = { fetchVocab, saveNewVocab, Setup, loadSets };
+module.exports = { fetchVocab, saveNewVocab, Setup, loadCats };

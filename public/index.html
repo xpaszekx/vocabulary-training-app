@@ -8,7 +8,7 @@
 </head>
 <body>
     <h1><a>Vocabulary</a> Training App</h1>
-    <section class="new-words">
+    <section id="new-words">
         <h2><a>&lt;</a>enter new words<a>&gt;</a></h2>
         <hr>
         <div class="special-chars">
@@ -25,20 +25,20 @@
             <input type="text" id="word-czech" placeholder="Švédsko"/>
         </fieldset>
         <fieldset>
-            <label for="word-set">enter the word's <a>&lt;</a>set<a>&gt;</a></label>
-            <input type="text" id="word-set" placeholder="geography"/>
+            <label for="word-category">enter the word's <a>&lt;</a>category<a>&gt;</a></label>
+            <input type="text" id="word-category" placeholder="geography"/>
         </fieldset>
-        <button type="submit" onclick="addToVoc(swedishInput, czechInput, wordSet)">Add new word</button>
-        <div id="known-sets"></div>
+        <button type="submit" onclick="addToVoc(swedishInput, czechInput, catInput)">Add new word</button>
+        <div id="known-cats"></div>
     </section>
     <section class="select-mode">
         <h2><a>&lt;</a>choose mode<a>&gt;</a></h2>
         <hr>
-        <button onclick="loadMode('practice')">Practice</button>
-        <button onclick="loadMode('test')">Testing</button>
+        <button onclick="loadMode('practicing')">Practice</button>
+        <button onclick="loadMode('testing')">Testing</button>
     </section>
-    <section id="modal-window">
-    </section>
+    <form id="select-cat"></form>
+    <section id="modal-window"></section>
     <script src="script.js"></script>
 </body>
 </html>

@@ -12,7 +12,7 @@ app.use(express.static("public"));
 app.use(express.json());
 
 app.get("/api/v1/fetchVocab", async (req, res) => {
-    const vocab = await DB.fetchVocab(req.query.set);
+    const vocab = await DB.fetchVocab(req.query.category);
     res.json(vocab);
 })
 
@@ -21,9 +21,9 @@ app.post("/api/v1/saveNewVocab", async (req, res) => {
     res.json(vocab);
 })
 
-app.get("/api/v1/loadSets", async (req, res) => {
-    const sets = await DB.loadSets();
-    res.json(sets);
+app.get("/api/v1/loadCats", async (req, res) => {
+    const cats = await DB.loadCats();
+    res.json(cats);
 })
 
 // set port

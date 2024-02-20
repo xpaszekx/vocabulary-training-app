@@ -1,33 +1,35 @@
 const swedishInput = document.getElementById("word-swedish");
 const czechInput = document.getElementById("word-czech");
-const wordSet = document.getElementById("word-set");
-const knownSets = document.getElementById("known-sets");
+const catInput = document.getElementById("word-category");
+const knownCats = document.getElementById("known-cats");
+const modalWindow = document.getElementById("modal-window");
+const selectCat = document.getElementById("select-cat");
+const totalScore = [ 0, 0 ];
 
 const CopyToClipboard = async (char) => await navigator.clipboard.writeText(char);
 
 const clearInputs = () => {
     swedishInput.value = "";
     czechInput.value = "";
-    wordSet.value = "";
+    catInput.value = "";
 }
 
-const loadSets = async () => {
+const loadCats = async () => {
+    const res = await fetch(`/api/v1/loadCats`);
+    const categories = await res.json();
 
-    const res = await fetch(`/api/v1/loadSets`);
-    const sets = await res.json();
-
-    if (sets.length > 0) {
-        knownSets.innerHTML = `
-        <h2><a>&lt;</a>listed sets<a>&gt;</a></h2>
+    if (categories.length > 0) {
+        knownCats.innerHTML = `
+        <h2><a>&lt;</a>listed categories<a>&gt;</a></h2>
         <hr>
-        <p class="listed-sets">${sets.map( e => e.wordset )}</p>`;
+        <p class="listed-cats">${categories.map(e => e.category)}</p>`;
     }
 }
 
 // save to DB
-const addToVoc = async (swedishInput, czechInput, wordSet) => {
+const addToVoc = async (swedishInput, czechInput, category) => {
     if (swedishInput.value === "" || czechInput.value === "" ||
-        wordSet.value === "") {
+        category.value === "") {
         alert("Invalid input\n");
         clearInputs();
         return;
@@ -41,25 +43,23 @@ const addToVoc = async (swedishInput, czechInput, wordSet) => {
         body: JSON.stringify({
             swedish: swedishInput.value,
             czech: czechInput.value,
-            set: wordSet.value
+            category: category.value
         })
     });
 
     clearInputs();
-    await loadSets();
+    await loadCats();
 }
 
-window.onload = loadSets;
-
-const modalWindow = document.getElementById("modal-window");
-const totalScore = [ 0, 0 ];
+window.onload = loadCats;
 
 const loadCardWindows = (taskType, deckSize) => {
     const cardsEl = document.querySelector("#czech-div");
     const footerEl = document.querySelector("#modal-footer");
 
     if (deckSize < 2) {
-        alert("Set isn't big enough, insert more words to practice!");
+        alert("Category isn't big enough, insert more words to practice!");
+        modalWindow.innerHTML = "";
         return;
     }
 
@@ -79,14 +79,14 @@ const loadCardWindows = (taskType, deckSize) => {
 }
 
 const renderModal = async (taskType) => {
-    const setInput = document.getElementById("task-set").value;
+    const category = document.getElementById("task-cat").value;
 
-    const res = await fetch(`/api/v1/fetchVocab?set=${setInput}`);
+    const res = await fetch(`/api/v1/fetchVocab?category=${category}`);
     const vocabulary = await res.json();
 
     modalWindow.innerHTML = `
         <div class="modal">
-            <div class="modal-content">
+            <div>
                 <span class="close" onclick="modalWindow.innerHTML = ''"><a>&lt;</a>x<a>&gt;</a></div>
                 <div class="cards">
                     <div class="card swedish" id="swedish-div"></div>
@@ -104,20 +104,29 @@ const renderModal = async (taskType) => {
     }
 }
 
-const loadMode = (mode) => {
-    const textMode = mode === "practice" ? "practicing" : "testing";
+const loadMode = async (mode) => {
     totalScore[0] = 0;
     totalScore[1] = 0;
 
-    modalWindow.innerHTML = `
-        <label for='task-set' style='margin: auto'>enter the 
-            <a>&lt;</a>set<a>&gt;</a> you'd like to practice</label>
-        <input type='text' id='task-set' placeholder='geography'/>
-        <button type='submit' onclick='renderModal("${textMode}")'>Start ${textMode}</button>`
+    const res = await fetch(`/api/v1/loadCats`);
+    let categories = await res.json();
+    categories = categories.map((e) => e.category);
+
+    selectCat.addEventListener("submit", function(e) {
+        e.preventDefault();
+    })
+
+    selectCat.innerHTML = `
+        <label for='task-cat' style='margin: auto'>Select the
+            <a>&lt;</a>category<a>&gt;</a> you'd like to practice</label>
+        <select name="wordset" id="task-cat">
+            <option value="">mix</option>
+            ${categories.map((cat) => `<option value="${cat}">${cat}</option>`).join('')}
+        </select>
+        <button type='submit' onclick='renderModal("${mode}")'>Start ${mode}</button>`;
 }
 
 const fillCard = (vocabulary, cardId, index) => {
-    console.log()
     const el = document.querySelector(`${cardId}`);
     el.style.setProperty('background-color', 'lightslategrey');
     el.innerText = vocabulary[index];
@@ -125,7 +134,7 @@ const fillCard = (vocabulary, cardId, index) => {
 }
 
 function highlightCards(correctWord, cards, choice) {
-    totalScore[1] += 1;
+    totalScore[1]++;
 
     for (let i = 0; i < 4; i++) {
         if (cards[i].innerText === correctWord && i === choice) {
