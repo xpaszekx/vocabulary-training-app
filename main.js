@@ -26,6 +26,11 @@ app.get("/api/v1/loadCats", async (req, res) => {
     res.json(cats);
 })
 
+app.get("/api/v1/viewCats", async (req, res) => {
+    const catDic = await DB.viewCats(req.query.category);
+    res.json(catDic);
+})
+
 // set port
 const PORT = process.env.PORT || 3000;
 

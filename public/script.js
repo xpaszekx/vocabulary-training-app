@@ -1,10 +1,15 @@
 const swedishInput = document.getElementById("word-swedish");
 const czechInput = document.getElementById("word-czech");
 const catInput = document.getElementById("word-category");
-const knownCats = document.getElementById("known-cats");
+const viewCat = document.getElementById("view-cat");
+const viewCatHeader = document.getElementById("view-cat-header");
 const modalWindow = document.getElementById("modal-window");
 const selectCat = document.getElementById("select-cat");
 const totalScore = [ 0, 0 ];
+let cards = [ ];
+let isTestingActive = false;
+
+// TODO: implement delete button for DB, maybe modal window to view vocab set list
 
 const CopyToClipboard = async (char) => await navigator.clipboard.writeText(char);
 
@@ -14,15 +19,47 @@ const clearInputs = () => {
     catInput.value = "";
 }
 
+const viewCats = async () => {
+    const res = await fetch(`/api/v1/viewCats?category=${document.querySelector("#view-cats").value}`);
+    let catDic = await res.json();
+
+    modalWindow.innerHTML = `
+        <div class="modal category">
+            <div>
+                <span class="close" onclick="modalWindow.innerHTML = ''"><a>&lt;</a>x<a>&gt;</a>
+            </div>
+            <div id="category-table">
+                <table>
+                    <tr>
+                        <th>swedish</th><th>czech</th>
+                    </tr>
+                    ${catDic.map((catDic) => `<tr><td>${catDic.swedish}</td><td>${catDic.czech}
+                        </td></tr>`).join('')}
+                </table>
+            </div>
+        </div>` }
+
 const loadCats = async () => {
     const res = await fetch(`/api/v1/loadCats`);
-    const categories = await res.json();
+    let categories = await res.json();
+    categories = categories.map((e) => e.category);
+
+    viewCat.addEventListener("submit", function(e) {
+        e.preventDefault();
+    })
 
     if (categories.length > 0) {
-        knownCats.innerHTML = `
-        <h2><a>&lt;</a>listed categories<a>&gt;</a></h2>
-        <hr>
-        <p class="listed-cats">${categories.map(e => e.category)}</p>`;
+        viewCatHeader.innerHTML = `
+            <h2><a>&lt;</a>view categories<a>&gt;</a></h2>
+            <hr>`;
+        viewCat.innerHTML = `
+            <label for='view-cats' style='margin: auto'>Select the
+                <a>&lt;</a>category<a>&gt;</a> you'd like to practice</label>
+            <select name="view-cats" id="view-cats">
+                <option value="">all</option>
+                ${categories.map((cat) => `<option value="${cat}">${cat}</option>`).join('')}
+            </select>
+            <button type='submit' onclick='viewCats()'>View set</button>`;
     }
 }
 
@@ -85,16 +122,16 @@ const renderModal = async (taskType) => {
     const vocabulary = await res.json();
 
     modalWindow.innerHTML = `
-        <div class="modal">
+        <div class="modal cards">
             <div>
-                <span class="close" onclick="modalWindow.innerHTML = ''"><a>&lt;</a>x<a>&gt;</a></div>
-                <div class="cards">
-                    <div class="card swedish" id="swedish-div"></div>
-                    <div id="czech-div"></div>
-                </div>
-                <div id="modal-footer">
-                    <button id="next-btn">Start</button>
-                </div>
+            <span class="close" onclick="modalWindow.innerHTML = ''"><a>&lt;</a>x<a>&gt;</a>
+            </div>
+            <div class="cards">
+                <div class="card swedish" id="swedish-div"></div>
+                <div id="czech-div"></div>
+            </div>
+            <div id="modal-footer">
+                <button id="next-btn">Start</button>
             </div>
         </div>`;
 
@@ -119,7 +156,7 @@ const loadMode = async (mode) => {
     selectCat.innerHTML = `
         <label for='task-cat' style='margin: auto'>Select the
             <a>&lt;</a>category<a>&gt;</a> you'd like to practice</label>
-        <select name="wordset" id="task-cat">
+        <select name="select-cats" id="task-cat">
             <option value="">mix</option>
             ${categories.map((cat) => `<option value="${cat}">${cat}</option>`).join('')}
         </select>
@@ -152,6 +189,7 @@ function highlightCards(correctWord, cards, choice) {
     let czechCardDiv = document.getElementById("czech-div");
     let elClone = czechCardDiv.cloneNode(true);
     czechCardDiv.parentNode.replaceChild(elClone, czechCardDiv);
+    isTestingActive = false;
 
     document.querySelector(".score").innerText = `score: ${totalScore[0]}/${totalScore[1]} ${ Math.round(totalScore[0] * 100.0 / totalScore[1]) }%`;
 }
@@ -167,10 +205,13 @@ const arrangeVocab = (vocabulary, correctWord) => {
 };
 
 const evaluateRound = (vocabulary, correctWord) => {
-    // TODO: implement delete button for DB, maybe modal window to view vocab set list
+    if (isTestingActive) {
+        highlightCards(correctWord, cards, NaN);
+    }
 
     vocabulary = arrangeVocab(vocabulary, correctWord);
-    const cards = [ ];
+    isTestingActive = true;
+    cards = [];
 
     for (let i = 0; i < 4; i++) {
         cards.push(fillCard(vocabulary, `#czech-word${i + 1}`, i));

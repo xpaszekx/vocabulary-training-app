@@ -29,11 +29,19 @@ const fetchVocab = async (category) => {
 }
 
 const saveNewVocab = async (entry) => {
-    return await _db.run("INSERT INTO vocabs (swedish, czech, category) VALUES (?, ?, ?)", entry.swedish, entry.czech, entry.category);
+    return await _db.run("INSERT INTO vocabs (swedish, czech, category) VALUES (?, ?, ?)",
+        entry.swedish, entry.czech, entry.category);
 }
 
 const loadCats = async() => {
     return await _db.all("SELECT DISTINCT category FROM vocabs");
 }
 
-module.exports = { fetchVocab, saveNewVocab, Setup, loadCats };
+const viewCats = async(cat) => {
+    if (cat === "") {
+        return await _db.all("SELECT swedish, czech FROM vocabs");
+    }
+    return await _db.all("SELECT swedish, czech FROM vocabs WHERE category = ?", cat);
+}
+
+module.exports = { fetchVocab, saveNewVocab, Setup, loadCats, viewCats };
