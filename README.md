@@ -8,7 +8,7 @@ vocabulary training app for personal use.
 ## testing part
 
 - implements card-like testing solution
-- relative score, option to choose from a given set
+- relative score, option to choose from a given category
 
-## listed sets
-- TODO: create a window for viewing the word list of a given set
+## listed categories
+- implements dictionary-like viewing
