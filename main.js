@@ -31,6 +31,11 @@ app.get("/api/v1/viewCats", async (req, res) => {
     res.json(catDic);
 })
 
+app.post("/api/v1/delFromVocab", async (req, res) => {
+    const vocab = await DB.delFromVocab(req.body);
+    res.json(vocab);
+})
+
 // set port
 const PORT = process.env.PORT || 3000;
 

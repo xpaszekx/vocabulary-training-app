@@ -28,9 +28,9 @@ const fetchVocab = async (category) => {
     return await _db.all("SELECT * FROM vocabs WHERE category = ?", category);
 }
 
-const saveNewVocab = async (entry) => {
+const saveNewVocab = async (e) => {
     return await _db.run("INSERT INTO vocabs (swedish, czech, category) VALUES (?, ?, ?)",
-        entry.swedish, entry.czech, entry.category);
+        e.swedish, e.czech, e.category);
 }
 
 const loadCats = async() => {
@@ -44,4 +44,15 @@ const viewCats = async(cat) => {
     return await _db.all("SELECT swedish, czech FROM vocabs WHERE category = ?", cat);
 }
 
-module.exports = { fetchVocab, saveNewVocab, Setup, loadCats, viewCats };
+const delFromVocab = async(e) => {
+    switch(e.type) {
+        case 'swedish':
+            return await _db.all("DELETE FROM vocabs WHERE swedish = ?", e.value);
+        case 'czech':
+            return await _db.all("DELETE FROM vocabs WHERE czech = ?", e.value);
+        case 'category':
+            return await _db.all("DELETE FROM vocabs WHERE category = ?", e.value);
+    }
+}
+
+module.exports = { fetchVocab, saveNewVocab, Setup, loadCats, viewCats, delFromVocab };

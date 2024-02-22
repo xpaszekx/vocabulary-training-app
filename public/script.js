@@ -90,6 +90,32 @@ const addToVoc = async (swedishInput, czechInput, category) => {
 
 window.onload = loadCats;
 
+const delFromVoc = async (swedishInput, czechInput, category) => {
+    if (swedishInput.value === "" && czechInput.value === "" &&
+        category.value === "") {
+        alert("Invalid input\n");
+        clearInputs();
+        return;
+    }
+
+    const value = swedishInput.value || czechInput.value || category.value;
+    const type = swedishInput.value ? "swedish" : czechInput.value ? "czech" : "category";
+
+    await fetch("/api/v1/delFromVocab", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            type: type,
+            value: value
+        })
+    });
+
+    clearInputs();
+    await loadCats();
+}
+
 const loadCardWindows = (taskType, deckSize) => {
     const cardsEl = document.querySelector("#czech-div");
     const footerEl = document.querySelector("#modal-footer");
