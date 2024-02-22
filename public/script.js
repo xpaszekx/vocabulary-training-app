@@ -9,7 +9,11 @@ const totalScore = [ 0, 0 ];
 let cards = [ ];
 let isTestingActive = false;
 
-const resetScore = () => totalScore.fill(0);
+const resetScore = () => {
+    totalScore.fill(0);
+    isTestingActive = false;
+    modalWindow.innerHTML = "";
+}
 
 catInput.addEventListener("keyup", async (e) => {
     if (e.key === "Enter") {
@@ -20,7 +24,6 @@ catInput.addEventListener("keyup", async (e) => {
 modalWindow.addEventListener("keyup", (e) => {
     if (e.key === "Escape") {
         resetScore();
-        modalWindow.innerHTML = "";
     }
 })
 
@@ -94,7 +97,6 @@ const updateCats = async () => {
     await loadCats();
 }
 
-// save to DB
 const addToVoc = async (swedishInput, czechInput, category) => {
     if (swedishInput.value === "" || czechInput.value === "" ||
         category.value === "") {
@@ -183,6 +185,8 @@ const loadCardWindows = (taskType, deckSize) => {
 }
 
 const renderModal = async (task) => {
+    resetScore();
+
     const category = document.getElementById("task-cat").value;
 
     const res = await fetch(`/api/v1/fetchVocab?category=${category}`);
@@ -191,7 +195,7 @@ const renderModal = async (task) => {
     modalWindow.innerHTML = `
         <div class="modal content">
             <div>
-            <span class="close" onclick="modalWindow.innerHTML = ''"><a>&lt;</a>x<a>&gt;</a>
+            <span class="close" onclick="resetScore()"><a>&lt;</a>x<a>&gt;</a>
             </div>
             <div class="cards">
                 <div id="swedish-div"></div>
@@ -201,6 +205,8 @@ const renderModal = async (task) => {
                 <button id="next-btn">Start</button>
             </div>
         </div>`;
+
+    selectCat.innerHTML = "";
 
     focusWindow(modalWindow);
     loadCardWindows(task, vocabulary.length);
@@ -293,7 +299,6 @@ const evaluateRound = (vocabulary, correctWord) => {
     }
 }
 
-// load from DB
 const loadCards = async (vocabulary, task) => {
     const swedishEl = document.querySelector("#card-swedish");
 
