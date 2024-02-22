@@ -72,7 +72,7 @@ a {
     border: 2px solid lightslategrey;
 }
 
-.modal.cards {
+.modal.content {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -90,15 +90,31 @@ a {
     cursor: pointer;
 }
 
-.cards {
+#modal-footer {
+    height: auto;
     display: flex;
-    gap: 40px;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 10px 10px 10px;
+    margin: 0;
 }
 
-#czech-div {
+.cards {
+    display: flex;
+    justify-content: space-around;
+    padding: 20px;
+    gap: 10px;
+    margin-bottom: 0;
+}
+
+#czech-div, #swedish-div {
+    width: 100%;
+    height: 220px;
+}
+
+#czech-testing-div {
+    height: 220px;
     display: grid;
-    width: 300px;
-    height: 200px;
     margin: auto;
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(2, 1fr);
@@ -107,30 +123,28 @@ a {
 
 .card {
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
+    text-align: center;
     margin: auto;
     font-size: 2rem;
     background-color: lightslategrey;
     box-shadow: black 0 10px;
+    word-break: break-all;
 }
 
-.card.swedish, #czech-div, #czech-word {
-    height: 200px;
-    width: 300px;
+.card.practice, .card.swedish.testing {
+    height: 98%;
 }
 
-.card.czech {
-    height: 80px;
-    width: 140px;
-    font-size: 1rem;
+.card.practice {
+    width: 100%;
 }
 
-#modal-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
+.card.czech.testing {
+    font-size: 1.2rem;
+    height: 90%;
+    width: 100%;
 }
 
 .score {
@@ -142,7 +156,7 @@ a {
     top: 20px;
     left: 20px;
     width: 88%;
-    height: 350px;
+    height: 320px;
     overflow-y: auto;
     display: flex;
     flex-direction: column;

@@ -9,14 +9,28 @@ const totalScore = [ 0, 0 ];
 let cards = [ ];
 let isTestingActive = false;
 
-// TODO: implement delete button for DB, maybe modal window to view vocab set list
+const resetScore = () => totalScore.fill(0);
+
+catInput.addEventListener("keyup", async (e) => {
+    if (e.key === "Enter") {
+        await addToVoc(swedishInput, czechInput, catInput);
+    }
+})
+
+modalWindow.addEventListener("keyup", (e) => {
+    if (e.key === "Escape") {
+        resetScore();
+        modalWindow.innerHTML = "";
+    }
+})
 
 const CopyToClipboard = async (char) => await navigator.clipboard.writeText(char);
 
-const clearInputs = () => {
-    swedishInput.value = "";
-    czechInput.value = "";
-    catInput.value = "";
+const clearInputs = () => [swedishInput, czechInput, catInput].forEach(input => input.value = "");
+
+const focusWindow = (el) => {
+    el.tabIndex = 0;
+    el.focus();
 }
 
 const viewCats = async () => {
@@ -37,7 +51,10 @@ const viewCats = async () => {
                         </td></tr>`).join('')}
                 </table>
             </div>
-        </div>` }
+        </div>`
+
+    focusWindow(modalWindow);
+}
 
 const loadCats = async () => {
     const res = await fetch(`/api/v1/loadCats`);
@@ -63,6 +80,20 @@ const loadCats = async () => {
     }
 }
 
+const loadSuggestions = async () => {
+    const res = await fetch(`/api/v1/loadCats`);
+    let categories = await res.json();
+    categories = categories.map((e) => e.category);
+
+    document.getElementById("suggestions").innerHTML = `
+    ${categories.map((cat) => `<option value="${cat}"></option>`).join('')}`;
+}
+
+const updateCats = async () => {
+    await loadSuggestions();
+    await loadCats();
+}
+
 // save to DB
 const addToVoc = async (swedishInput, czechInput, category) => {
     if (swedishInput.value === "" || czechInput.value === "" ||
@@ -85,10 +116,10 @@ const addToVoc = async (swedishInput, czechInput, category) => {
     });
 
     clearInputs();
-    await loadCats();
+    await updateCats();
 }
 
-window.onload = loadCats;
+window.onload = updateCats;
 
 const delFromVoc = async (swedishInput, czechInput, category) => {
     if (swedishInput.value === "" && czechInput.value === "" &&
@@ -113,14 +144,15 @@ const delFromVoc = async (swedishInput, czechInput, category) => {
     });
 
     clearInputs();
-    await loadCats();
+    await updateCats();
 }
 
 const loadCardWindows = (taskType, deckSize) => {
-    const cardsEl = document.querySelector("#czech-div");
+    const swedishDiv = document.querySelector( "#swedish-div")
+    const czechDiv = document.querySelector("#czech-div");
     const footerEl = document.querySelector("#modal-footer");
 
-    if (deckSize < 2) {
+    if (deckSize < 1) {
         alert("Category isn't big enough, insert more words to practice!");
         modalWindow.innerHTML = "";
         return;
@@ -128,11 +160,20 @@ const loadCardWindows = (taskType, deckSize) => {
 
     switch(taskType) {
         case "practicing":
-                cardsEl.innerHTML = `<div class="card czech" id="czech-word"></div>`;
+                swedishDiv.innerHTML = `<div class="card practice" id="card-swedish"></div>`
+                czechDiv.innerHTML = `<div class="card practice" id="czech-practice"></div>`;
             break;
         case "testing":
+            swedishDiv.innerHTML = `<div class="card swedish testing" id="card-swedish"></div>`
+            czechDiv.innerHTML = `<div id="czech-testing-div">`
+
+            swedishDiv.style.width = '80%';
+            swedishDiv.style.paddingTop = '5px';
+            czechDiv.style.width = '110%';
+            const czechCardsInner = document.querySelector("#czech-testing-div");
+
             for (let i = 0; i < 4; i++) {
-                cardsEl.innerHTML += `<div class="card czech" id="czech-word${i + 1}"></div>`;
+                czechCardsInner.innerHTML += `<div class="card czech testing" id="czech-testing${i + 1}"></div>`;
             }
             footerEl.innerHTML += `<p class="score">score:</p>`
             break;
@@ -141,19 +182,19 @@ const loadCardWindows = (taskType, deckSize) => {
     }
 }
 
-const renderModal = async (taskType) => {
+const renderModal = async (task) => {
     const category = document.getElementById("task-cat").value;
 
     const res = await fetch(`/api/v1/fetchVocab?category=${category}`);
     const vocabulary = await res.json();
 
     modalWindow.innerHTML = `
-        <div class="modal cards">
+        <div class="modal content">
             <div>
             <span class="close" onclick="modalWindow.innerHTML = ''"><a>&lt;</a>x<a>&gt;</a>
             </div>
             <div class="cards">
-                <div class="card swedish" id="swedish-div"></div>
+                <div id="swedish-div"></div>
                 <div id="czech-div"></div>
             </div>
             <div id="modal-footer">
@@ -161,15 +202,20 @@ const renderModal = async (taskType) => {
             </div>
         </div>`;
 
-    loadCardWindows(taskType, vocabulary.length);
+    focusWindow(modalWindow);
+    loadCardWindows(task, vocabulary.length);
     document.querySelector("#next-btn").onclick = () => {
-        loadCards(vocabulary, taskType);
+        loadCards(vocabulary, task);
     }
+    modalWindow.addEventListener("keyup", (e) => {
+        if (e.key === "Enter") {
+            loadCards(vocabulary, task);
+        }
+    })
 }
 
 const loadMode = async (mode) => {
-    totalScore[0] = 0;
-    totalScore[1] = 0;
+    resetScore();
 
     const res = await fetch(`/api/v1/loadCats`);
     let categories = await res.json();
@@ -240,7 +286,7 @@ const evaluateRound = (vocabulary, correctWord) => {
     cards = [];
 
     for (let i = 0; i < 4; i++) {
-        cards.push(fillCard(vocabulary, `#czech-word${i + 1}`, i));
+        cards.push(fillCard(vocabulary, `#czech-testing${i + 1}`, i));
         cards[i].addEventListener("click", () => {
             highlightCards(correctWord, cards, i);
         })
@@ -248,8 +294,8 @@ const evaluateRound = (vocabulary, correctWord) => {
 }
 
 // load from DB
-const loadCards = (vocabulary, task) => {
-    const swedishEl = document.querySelector("#swedish-div");
+const loadCards = async (vocabulary, task) => {
+    const swedishEl = document.querySelector("#card-swedish");
 
     document.getElementById("next-btn").innerText = "Next";
     let index = Math.floor(Math.random() * vocabulary.length);
@@ -259,8 +305,6 @@ const loadCards = (vocabulary, task) => {
     if (task === "testing") {
         evaluateRound(vocabulary.map(e => e.czech), czechWord);
     } else {
-        const czechEl = document.querySelector(".card.czech");
-        czechEl.style.setProperty('font-size','2rem');
-        czechEl.innerText = `${vocabulary[index].czech}`;
+        document.querySelector("#czech-practice").innerText = `${vocabulary[index].czech}`;
     }
 }
