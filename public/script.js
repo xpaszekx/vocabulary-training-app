@@ -1,23 +1,19 @@
-const swedishInput = document.getElementById("word-swedish");
-const czechInput = document.getElementById("word-czech");
+const secondInput = document.getElementById("word-second");
+const nativeInput = document.getElementById("word-native");
 const catInput = document.getElementById("word-category");
 const viewCat = document.getElementById("view-cat");
 const viewCatHeader = document.getElementById("view-cat-header");
 const modalWindow = document.getElementById("modal-window");
 const selectCat = document.getElementById("select-cat");
 const totalScore = [ 0, 0 ];
+let langKeyValue;
 let cards = [ ];
 let isTestingActive = false;
 
-const resetScore = () => {
-    totalScore.fill(0);
-    isTestingActive = false;
-    modalWindow.innerHTML = "";
-}
-
 catInput.addEventListener("keyup", async (e) => {
     if (e.key === "Enter") {
-        await addToVoc(swedishInput, czechInput, catInput);
+        await addToVoc(secondInput, nativeInput, catInput);
+        focusWindow(secondInput);
     }
 })
 
@@ -27,9 +23,18 @@ modalWindow.addEventListener("keyup", (e) => {
     }
 })
 
-const CopyToClipboard = async (char) => await navigator.clipboard.writeText(char);
+const resetScore = () => {
+    totalScore.fill(0);
+    isTestingActive = false;
+    modalWindow.innerHTML = "";
+}
 
-const clearInputs = () => [swedishInput, czechInput, catInput].forEach(input => input.value = "");
+const CopyToClipboard = async (char) => {
+    await navigator.clipboard.writeText(char);
+    focusWindow(secondInput);
+}
+
+const clearInputs = () => [secondInput, nativeInput, catInput].forEach(input => input.value = "");
 
 const focusWindow = (el) => {
     el.tabIndex = 0;
@@ -37,7 +42,7 @@ const focusWindow = (el) => {
 }
 
 const viewCats = async () => {
-    const res = await fetch(`/api/v1/viewCats?category=${document.querySelector("#view-cats").value}`);
+    const res = await fetch(`/api/v1/viewCats?category=${document.querySelector("#view-cats").value}&langKey=${langKeyValue}`);
     let catDic = await res.json();
 
     modalWindow.innerHTML = `
@@ -48,9 +53,9 @@ const viewCats = async () => {
             <div id="category-table">
                 <table>
                     <tr>
-                        <th>swedish</th><th>czech</th>
+                        <th>${langKeyValue}</th><th>czech</th>
                     </tr>
-                    ${catDic.map((catDic) => `<tr><td>${catDic.swedish}</td><td>${catDic.czech}
+                    ${catDic.map((catDic) => `<tr><td>${catDic.second}</td><td>${catDic.native}
                         </td></tr>`).join('')}
                 </table>
             </div>
@@ -60,7 +65,7 @@ const viewCats = async () => {
 }
 
 const loadCats = async () => {
-    const res = await fetch(`/api/v1/loadCats`);
+    const res = await fetch(`/api/v1/loadCats?langKey=${langKeyValue}`);
     let categories = await res.json();
     categories = categories.map((e) => e.category);
 
@@ -84,7 +89,7 @@ const loadCats = async () => {
 }
 
 const loadSuggestions = async () => {
-    const res = await fetch(`/api/v1/loadCats`);
+    const res = await fetch(`/api/v1/loadCats?langKey=${langKeyValue}`);
     let categories = await res.json();
     categories = categories.map((e) => e.category);
 
@@ -92,18 +97,45 @@ const loadSuggestions = async () => {
     ${categories.map((cat) => `<option value="${cat}"></option>`).join('')}`;
 }
 
-const updateCats = async () => {
+const updateSections = async () => {
+    langKeyValue = document.getElementById("langkey-input").value;
+
     await loadSuggestions();
     await loadCats();
+
+    document.querySelector("#foreign-label").innerHTML = `
+    enter word in <a>&lt;</a>${langKeyValue}<a>&gt;</a>`;
 }
 
-const addToVoc = async (swedishInput, czechInput, category) => {
-    if (swedishInput.value === "" || czechInput.value === "" ||
+const loadLangKeys = async () => {
+    const res = await fetch(`/api/v1/loadLangKeys`);
+    let langKeys = await res.json();
+
+    document.querySelector("#langkeys").innerHTML = `
+            <label for='langkey-input' style='margin: auto'>Select the
+            <a>&lt;</a>language<a>&gt;</a> you'd like to practice</label>
+            <input type="text" id="langkey-input" placeholder="swedish" list="langkey-list"/>
+            <datalist id="langkey-list">
+                ${langKeys.map((key) => `<option value="${key.lang_key}">${key.lang_key}</option>`).join('')}
+            </datalist>
+            <button type='submit' onclick="updateSections()">Select language</button>`;
+}
+
+// document.querySelector("#langkey-input").addEventListener("keyup", async (e) => {
+//     if (e.key === "Enter") {
+//         await updateSections();
+//     }
+// })
+
+const addToVoc = async (secondInput, nativeInput, category) => {
+    if (secondInput.value === "" || nativeInput.value === "" ||
         category.value === "") {
         alert("Invalid input\n");
         clearInputs();
         return;
     }
+
+    console.log(langKeyValue, secondInput.value, nativeInput.value, category.value);
 
     await fetch("/api/v1/saveNewVocab", {
         method: "POST",
@@ -111,28 +143,29 @@ const addToVoc = async (swedishInput, czechInput, category) => {
             "Content-Type": "application/json"
         },
         body: JSON.stringify({
-            swedish: swedishInput.value,
-            czech: czechInput.value,
-            category: category.value
+            second: secondInput.value,
+            native: nativeInput.value,
+            category: category.value,
+            langKey: langKeyValue
         })
     });
 
     clearInputs();
-    await updateCats();
+    await updateSections();
 }
 
-window.onload = updateCats;
+window.onload = loadLangKeys;
 
-const delFromVoc = async (swedishInput, czechInput, category) => {
-    if (swedishInput.value === "" && czechInput.value === "" &&
+const delFromVoc = async (secondInput, nativeInput, category) => {
+    if (secondInput.value === "" && nativeInput.value === "" &&
         category.value === "") {
         alert("Invalid input\n");
         clearInputs();
         return;
     }
 
-    const value = swedishInput.value || czechInput.value || category.value;
-    const type = swedishInput.value ? "swedish" : czechInput.value ? "czech" : "category";
+    const value = secondInput.value || nativeInput.value || category.value;
+    const type = secondInput.value ? "second" : nativeInput.value ? "native" : "category";
 
     await fetch("/api/v1/delFromVocab", {
         method: "POST",
@@ -141,12 +174,13 @@ const delFromVoc = async (swedishInput, czechInput, category) => {
         },
         body: JSON.stringify({
             type: type,
-            value: value
+            value: value,
+            langKey: langKeyValue
         })
     });
 
     clearInputs();
-    await updateCats();
+    await updateSections();
 }
 
 const loadCardWindows = (taskType, deckSize) => {
@@ -189,7 +223,7 @@ const renderModal = async (task) => {
 
     const category = document.getElementById("task-cat").value;
 
-    const res = await fetch(`/api/v1/fetchVocab?category=${category}`);
+    const res = await fetch(`/api/v1/fetchVocab?category=${category}&langKey=${langKeyValue}`);
     const vocabulary = await res.json();
 
     modalWindow.innerHTML = `
@@ -223,7 +257,7 @@ const renderModal = async (task) => {
 const loadMode = async (mode) => {
     resetScore();
 
-    const res = await fetch(`/api/v1/loadCats`);
+    const res = await fetch(`/api/v1/loadCats?langKey=${langKeyValue}`);
     let categories = await res.json();
     categories = categories.map((e) => e.category);
 
@@ -284,7 +318,7 @@ const arrangeVocab = (vocabulary, correctWord) => {
 
 const evaluateRound = (vocabulary, correctWord) => {
     if (isTestingActive) {
-        highlightCards(correctWord, cards, NaN);
+        highlightCards(correctWord, cards, undefined);
     }
 
     vocabulary = arrangeVocab(vocabulary, correctWord);
@@ -300,16 +334,16 @@ const evaluateRound = (vocabulary, correctWord) => {
 }
 
 const loadCards = async (vocabulary, task) => {
-    const swedishEl = document.querySelector("#card-swedish");
+    const secondEl = document.querySelector("#card-swedish");
 
     document.getElementById("next-btn").innerText = "Next";
     let index = Math.floor(Math.random() * vocabulary.length);
-    swedishEl.innerText = `${vocabulary[index].swedish}`;
-    const czechWord = vocabulary[index].czech;
+    secondEl.innerText = `${vocabulary[index].second}`;
+    const nativeWord = vocabulary[index].native;
 
     if (task === "testing") {
-        evaluateRound(vocabulary.map(e => e.czech), czechWord);
+        evaluateRound(vocabulary.map(e => e.native), nativeWord);
     } else {
-        document.querySelector("#czech-practice").innerText = `${vocabulary[index].czech}`;
+        document.querySelector("#czech-practice").innerText = `${vocabulary[index].native}`;
     }
 }

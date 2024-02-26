@@ -8,6 +8,11 @@
 </head>
 <body>
     <h1><a>Vocabulary</a> Training App</h1>
+    <section>
+        <h2><a>&lt;</a>available languages<a>&gt;</a></h2>
+        <hr>
+        <div id="langkeys"></div>
+    </section>
     <section id="new-words">
         <h2><a>&lt;</a>enter new words<a>&gt;</a></h2>
         <hr>
@@ -15,22 +20,28 @@
             <button onclick="CopyToClipboard('ä')">ä</button>
             <button onclick="CopyToClipboard('å')">å</button>
             <button onclick="CopyToClipboard('ö')">ö</button>
+            <button onclick="CopyToClipboard('ç')">ç</button>
+            <button onclick="CopyToClipboard('ê')">ê</button>
+            <button onclick="CopyToClipboard('è')">è</button>
+            <button onclick="CopyToClipboard('î')">î</button>
+            <button onclick="CopyToClipboard('à')">à</button>
+            <button onclick="CopyToClipboard('â')">â</button>
         </div>
         <fieldset>
-            <label for="word-swedish">enter word in <a>&lt;</a>Swedish<a>&gt;</a></label>
-            <input type="text" id="word-swedish" placeholder="Sverige"/>
+            <label for="word-second" id="foreign-label">enter word in <a>&lt;</a>none<a>&gt;</a></label>
+            <input type="text" id="word-second" placeholder="Sverige"/>
         </fieldset>
         <fieldset>
-            <label for="word-czech">enter word in <a>&lt;</a>Czech<a>&gt;</a></label>
-            <input type="text" id="word-czech" placeholder="Švédsko"/>
+            <label for="word-native">enter word in <a>&lt;</a>czech<a>&gt;</a></label>
+            <input type="text" id="word-native" placeholder="Švédsko"/>
         </fieldset>
         <fieldset>
             <label for="word-category">enter the word's <a>&lt;</a>category<a>&gt;</a></label>
             <input type="text" id="word-category" placeholder="geography" list="suggestions"/>
             <datalist id="suggestions"></datalist>
         </fieldset>
-        <button type="submit" onclick="addToVoc(swedishInput, czechInput, catInput)" id="add-word">Add word</button>
-        <button type="submit" onclick="delFromVoc(swedishInput, czechInput, catInput)">Delete</button>
+        <button type="submit" onclick="addToVoc(secondInput, nativeInput, catInput)" id="add-word">Add word</button>
+        <button type="submit" onclick="delFromVoc(secondInput, nativeInput, catInput)">Delete</button>
     </section>
     <section>
         <div id="view-cat-header"></div>

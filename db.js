@@ -12,8 +12,9 @@ const Setup = async () => {
     await db.exec(`
         CREATE TABLE IF NOT EXISTS vocabs (
             id INTEGER PRIMARY KEY,
-            swedish TEXT NOT NULL,
-            czech TEXT NOT NULL,
+            lang_key TEXT NOT NULL,
+            second TEXT NOT NULL, 
+            native TEXT NOT NULL,
             category TEXT NOT NULL
         );`
     )
@@ -21,38 +22,43 @@ const Setup = async () => {
     _db = db;
 }
 
-const fetchVocab = async (category) => {
+const fetchVocab = async (category, langKey) => {
     if (category === "") { // i hate JS
-        return await _db.all("SELECT * FROM vocabs");
+        return await _db.all("SELECT * FROM vocabs WHERE lang_key = ?", langKey);
     }
-    return await _db.all("SELECT * FROM vocabs WHERE category = ?", category);
+    return await _db.all("SELECT * FROM vocabs WHERE category = ? AND lang_key = ?", category, langKey);
 }
 
 const saveNewVocab = async (e) => {
-    return await _db.run("INSERT INTO vocabs (swedish, czech, category) VALUES (?, ?, ?)",
-        e.swedish, e.czech, e.category);
+    console.log(e.langKey);
+    return await _db.run("INSERT INTO vocabs (second, native, category, lang_key) VALUES (?, ?, ?, ?)",
+        e.second, e.native, e.category, e.langKey);
 }
 
-const loadCats = async() => {
-    return await _db.all("SELECT DISTINCT category FROM vocabs");
+const loadCats = async(langKey) => {
+    return await _db.all("SELECT DISTINCT category FROM vocabs WHERE lang_key = ?", langKey);
 }
 
-const viewCats = async(cat) => {
+const viewCats = async(cat, langKey) => {
     if (cat === "") {
-        return await _db.all("SELECT swedish, czech FROM vocabs");
+        return await _db.all("SELECT second, native FROM vocabs WHERE lang_key = ?", langKey);
     }
-    return await _db.all("SELECT swedish, czech FROM vocabs WHERE category = ?", cat);
+    return await _db.all("SELECT second, native FROM vocabs WHERE category = ? AND lang_key = ?", cat, langKey);
 }
 
 const delFromVocab = async(e) => {
     switch(e.type) {
-        case 'swedish':
-            return await _db.all("DELETE FROM vocabs WHERE swedish = ?", e.value);
-        case 'czech':
-            return await _db.all("DELETE FROM vocabs WHERE czech = ?", e.value);
+        case 'second':
+            return await _db.all("DELETE FROM vocabs WHERE second = ? AND lang_key = ?", e.value, e.langKey);
+        case 'native':
+            return await _db.all("DELETE FROM vocabs WHERE native = ? AND lang_key = ?", e.value, e.langKey);
         case 'category':
-            return await _db.all("DELETE FROM vocabs WHERE category = ?", e.value);
+            return await _db.all("DELETE FROM vocabs WHERE category = ? AND lang_key = ?", e.value, e.langKey);
     }
 }
 
-module.exports = { fetchVocab, saveNewVocab, Setup, loadCats, viewCats, delFromVocab };
+const loadLangKeys = async () => {
+    return await _db.all("SELECT DISTINCT lang_key FROM vocabs");
+}
+
+module.exports = { fetchVocab, saveNewVocab, Setup, loadCats, viewCats, delFromVocab, loadLangKeys };

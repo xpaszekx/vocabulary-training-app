@@ -56,7 +56,7 @@ a {
     max-width: 100%;
 }
 
-#select-cat, #view-cat {
+#select-cat, #view-cat, #langkeys {
     width: 280px;
 }
 
@@ -175,4 +175,14 @@ a {
     border: 1px solid lightslategrey;
     background-color: #202022;
     text-align: left;
+}
+
+@media (max-width: 700px) {
+    .card.practice, .card.testing.swedish {
+        font-size: 1.5rem;
+    }
+
+    .card.testing.czech {
+        font-size: 1rem;
+    }
 }
