@@ -23,6 +23,12 @@ modalWindow.addEventListener("keyup", (e) => {
     }
 })
 
+document.querySelector("#langkeys").addEventListener("keyup", async (e) => {
+    if (e.key === "Enter") {
+        await updateSections();
+    }
+})
+
 const resetScore = () => {
     totalScore.fill(0);
     isTestingActive = false;
@@ -79,12 +85,15 @@ const loadCats = async () => {
             <hr>`;
         viewCat.innerHTML = `
             <label for='view-cats' style='margin: auto'>Select the
-                <a>&lt;</a>category<a>&gt;</a> you'd like to practice</label>
+                <a>&lt;</a>category<a>&gt;</a> you'd like to view</label>
             <select name="view-cats" id="view-cats">
                 <option value="">all</option>
                 ${categories.map((cat) => `<option value="${cat}">${cat}</option>`).join('')}
             </select>
             <button type='submit' onclick='viewCats()'>View set</button>`;
+    } else {
+        viewCatHeader.innerHTML = "";
+        viewCat.innerHTML = "";
     }
 }
 
@@ -102,6 +111,7 @@ const updateSections = async () => {
 
     await loadSuggestions();
     await loadCats();
+    selectCat.innerHTML = "";
 
     document.querySelector("#foreign-label").innerHTML = `
     enter word in <a>&lt;</a>${langKeyValue}<a>&gt;</a>`;
@@ -121,22 +131,13 @@ const loadLangKeys = async () => {
             <button type='submit' onclick="updateSections()">Select language</button>`;
 }
 
-// document.querySelector("#langkey-input").addEventListener("keyup", async (e) => {
-//     if (e.key === "Enter") {
-//         await updateSections();
-//     }
-// })
-
 const addToVoc = async (secondInput, nativeInput, category) => {
     if (secondInput.value === "" || nativeInput.value === "" ||
-        category.value === "") {
+        category.value === "" || !langKeyValue) {
         alert("Invalid input\n");
         clearInputs();
         return;
     }
-
-    console.log(langKeyValue, secondInput.value, nativeInput.value, category.value);
-
     await fetch("/api/v1/saveNewVocab", {
         method: "POST",
         headers: {
@@ -184,8 +185,8 @@ const delFromVoc = async (secondInput, nativeInput, category) => {
 }
 
 const loadCardWindows = (taskType, deckSize) => {
-    const swedishDiv = document.querySelector( "#swedish-div")
-    const czechDiv = document.querySelector("#czech-div");
+    const secondDiv = document.querySelector( "#second-div")
+    const nativeDiv = document.querySelector("#native-div");
     const footerEl = document.querySelector("#modal-footer");
 
     if (deckSize < 1) {
@@ -196,20 +197,20 @@ const loadCardWindows = (taskType, deckSize) => {
 
     switch(taskType) {
         case "practicing":
-                swedishDiv.innerHTML = `<div class="card practice" id="card-swedish"></div>`
-                czechDiv.innerHTML = `<div class="card practice" id="czech-practice"></div>`;
+                secondDiv.innerHTML = `<div class="card practice" id="card-second"></div>`
+                nativeDiv.innerHTML = `<div class="card practice" id="native-practice"></div>`;
             break;
         case "testing":
-            swedishDiv.innerHTML = `<div class="card swedish testing" id="card-swedish"></div>`
-            czechDiv.innerHTML = `<div id="czech-testing-div">`
+            secondDiv.innerHTML = `<div class="card second testing" id="card-second"></div>`
+            nativeDiv.innerHTML = `<div id="native-testing-div">`
 
-            swedishDiv.style.width = '80%';
-            swedishDiv.style.paddingTop = '5px';
-            czechDiv.style.width = '110%';
-            const czechCardsInner = document.querySelector("#czech-testing-div");
+            secondDiv.style.width = '80%';
+            secondDiv.style.paddingTop = '5px';
+            nativeDiv.style.width = '110%';
+            const nativeCardsInner = document.querySelector("#native-testing-div");
 
             for (let i = 0; i < 4; i++) {
-                czechCardsInner.innerHTML += `<div class="card czech testing" id="czech-testing${i + 1}"></div>`;
+                nativeCardsInner.innerHTML += `<div class="card native testing" id="native-testing${i + 1}"></div>`;
             }
             footerEl.innerHTML += `<p class="score">score:</p>`
             break;
@@ -232,8 +233,8 @@ const renderModal = async (task) => {
             <span class="close" onclick="resetScore()"><a>&lt;</a>x<a>&gt;</a>
             </div>
             <div class="cards">
-                <div id="swedish-div"></div>
-                <div id="czech-div"></div>
+                <div id="second-div"></div>
+                <div id="native-div"></div>
             </div>
             <div id="modal-footer">
                 <button id="next-btn">Start</button>
@@ -298,9 +299,9 @@ function highlightCards(correctWord, cards, choice) {
         cards[i].style.setProperty('background-color', 'darkred');
     }
 
-    let czechCardDiv = document.getElementById("czech-div");
-    let elClone = czechCardDiv.cloneNode(true);
-    czechCardDiv.parentNode.replaceChild(elClone, czechCardDiv);
+    let nativeCardDiv = document.getElementById("native-div");
+    let elClone = nativeCardDiv.cloneNode(true);
+    nativeCardDiv.parentNode.replaceChild(elClone, nativeCardDiv);
     isTestingActive = false;
 
     document.querySelector(".score").innerText = `score: ${totalScore[0]}/${totalScore[1]} ${ Math.round(totalScore[0] * 100.0 / totalScore[1]) }%`;
@@ -326,7 +327,7 @@ const evaluateRound = (vocabulary, correctWord) => {
     cards = [];
 
     for (let i = 0; i < 4; i++) {
-        cards.push(fillCard(vocabulary, `#czech-testing${i + 1}`, i));
+        cards.push(fillCard(vocabulary, `#native-testing${i + 1}`, i));
         cards[i].addEventListener("click", () => {
             highlightCards(correctWord, cards, i);
         })
@@ -334,7 +335,7 @@ const evaluateRound = (vocabulary, correctWord) => {
 }
 
 const loadCards = async (vocabulary, task) => {
-    const secondEl = document.querySelector("#card-swedish");
+    const secondEl = document.querySelector("#card-second");
 
     document.getElementById("next-btn").innerText = "Next";
     let index = Math.floor(Math.random() * vocabulary.length);
@@ -344,6 +345,6 @@ const loadCards = async (vocabulary, task) => {
     if (task === "testing") {
         evaluateRound(vocabulary.map(e => e.native), nativeWord);
     } else {
-        document.querySelector("#czech-practice").innerText = `${vocabulary[index].native}`;
+        document.querySelector("#native-practice").innerText = `${vocabulary[index].native}`;
     }
 }

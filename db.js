@@ -30,7 +30,6 @@ const fetchVocab = async (category, langKey) => {
 }
 
 const saveNewVocab = async (e) => {
-    console.log(e.langKey);
     return await _db.run("INSERT INTO vocabs (second, native, category, lang_key) VALUES (?, ?, ?, ?)",
         e.second, e.native, e.category, e.langKey);
 }

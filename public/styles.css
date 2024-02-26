@@ -35,8 +35,10 @@ fieldset {
 }
 
 input {
-    background-color: whitesmoke;
-    color: #202020;
+    color: whitesmoke;
+    background-color: #202020;
+    border: 1px solid steelblue;
+    padding: 2px;
 }
 
 button {
@@ -107,12 +109,12 @@ a {
     margin-bottom: 0;
 }
 
-#czech-div, #swedish-div {
+#native-div, #second-div {
     width: 100%;
     height: 220px;
 }
 
-#czech-testing-div {
+#native-testing-div {
     height: 220px;
     display: grid;
     margin: auto;
@@ -127,13 +129,13 @@ a {
     align-items: center;
     text-align: center;
     margin: auto;
-    font-size: 2rem;
+    font-size: 1.7rem;
     background-color: lightslategrey;
     box-shadow: black 0 10px;
     word-break: break-all;
 }
 
-.card.practice, .card.swedish.testing {
+.card.practice, .card.second.testing {
     height: 98%;
 }
 
@@ -141,7 +143,7 @@ a {
     width: 100%;
 }
 
-.card.czech.testing {
+.card.native.testing {
     font-size: 1.2rem;
     height: 90%;
     width: 100%;
@@ -156,9 +158,10 @@ a {
     top: 20px;
     left: 20px;
     width: 88%;
-    height: 320px;
+    height: 340px;
     overflow-y: auto;
     display: flex;
+    font-size: 0.9rem;
     flex-direction: column;
 }
 
@@ -178,11 +181,11 @@ a {
 }
 
 @media (max-width: 700px) {
-    .card.practice, .card.testing.swedish {
-        font-size: 1.5rem;
+    .card.practice, .card.testing.second {
+        font-size: 1.3rem;
     }
 
-    .card.testing.czech {
-        font-size: 1rem;
+    .card.testing.native {
+        font-size: 0.9rem;
     }
 }
