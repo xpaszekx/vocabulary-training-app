@@ -90,7 +90,7 @@ const loadCats = async () => {
                 <option value="">all</option>
                 ${categories.map((cat) => `<option value="${cat}">${cat}</option>`).join('')}
             </select>
-            <button type='submit' onclick='viewCats()'>View set</button>`;
+            <button type='submit' onclick='viewCats()'>View</button>`;
     } else {
         viewCatHeader.innerHTML = "";
         viewCat.innerHTML = "";
