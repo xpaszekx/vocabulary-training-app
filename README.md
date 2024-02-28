@@ -1,18 +1,16 @@
 # vocabulary-training-app
 vocabulary training app for personal use.
 
-## words manamagement
+## vocabulary management
 - section for adding words with appropriate categories
 - deleting words, categories
 
-## training part
+## viewing dictionaries
+- allows user to view the whole language dictionary or a chosen category
 
-- aims to speed up the learning process, card-like
+## training part
+- implemented to study cards
 
 ## testing part
-
-- implements card-like testing solution
+- implements a testing solution using cards
 - relative score, option to choose from a given category
-
-## listed categories
-- implements dictionary-like viewing
