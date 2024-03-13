@@ -212,7 +212,8 @@ const loadCardWindows = (taskType, deckSize) => {
             for (let i = 0; i < 4; i++) {
                 nativeCardsInner.innerHTML += `<div class="card native testing" id="native-testing${i + 1}"></div>`;
             }
-            footerEl.innerHTML += `<p class="score">score:</p>`
+            footerEl.innerHTML = `<p class="score">score:</p>
+                                 <button id="next-btn">Start</button>`
             break;
         default:
             break;
@@ -312,9 +313,10 @@ const shuffleArray = (array) => array.sort(() => Math.random() - 0.5);
 const arrangeVocab = (vocabulary, correctWord) => {
     const correctIndex = vocabulary.indexOf(correctWord);
     vocabulary.splice(correctIndex, 1);
-    vocabulary.unshift(correctWord);
+    let shuffled = shuffleArray(vocabulary);
+    shuffled.unshift(correctWord);
 
-    return shuffleArray(vocabulary.slice(0, 4));
+    return shuffleArray(shuffled.slice(0, 4));
 };
 
 const evaluateRound = (vocabulary, correctWord) => {

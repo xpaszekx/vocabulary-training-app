@@ -154,11 +154,11 @@ a {
 }
 
 #category-table {
-    position: relative;
-    top: 20px;
+    position: absolute;
+    top: 35px;
     left: 20px;
     width: 88%;
-    height: 90%;
+    height: 85%;
     overflow-y: auto;
     display: flex;
     font-size: 0.9rem;
