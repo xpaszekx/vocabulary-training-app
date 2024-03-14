@@ -50,6 +50,7 @@ const focusWindow = (el) => {
 const viewCats = async () => {
     const res = await fetch(`/api/v1/viewCats?category=${document.querySelector("#view-cats").value}&langKey=${langKeyValue}`);
     let catDic = await res.json();
+    catDic.sort((a, b) => a.second.localeCompare(b.second));
 
     modalWindow.innerHTML = `
         <div class="modal category">
